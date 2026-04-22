@@ -7,99 +7,148 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        body, html { height: 100%; margin: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        
-        .hero {
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+        body, html { 
+            height: 100%; 
+            margin: 0; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            overflow: hidden; 
+        }
+
+        .main-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Ліва частина: Біла з контентом */
+        .left-side {
+            flex: 1;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            z-index: 2;
+        }
+
+        /* Права частина: Зображення собаки */
+        .right-side {
+            flex: 1;
+            background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
                         url('https://images.unsplash.com/photo-1544568100-847a948585b9?q=80&w=1974&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
+            position: relative;
+        }
+
+        /* Декор для розділення (хвиля або лінія) */
+        .right-side::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 50px;
+            background: linear-gradient(to right, white, transparent);
         }
 
         .brand-title {
-            font-size: 5.5rem;
+            font-size: 4.5rem;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: -2px;
-            margin-bottom: 40px; /* Збільшив відступ до кнопок */
-            text-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            animation: fadeInUp 0.8s ease-out;
+            color: #011627;
+            margin-bottom: 50px;
         }
 
         .brand-title span {
             color: #2ec4b6;
         }
 
+        .btn-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 350px;
+        }
+
         .btn-hero { 
-            padding: 16px 45px; 
-            border-radius: 50px; 
+            padding: 20px; 
+            border-radius: 20px; 
             font-weight: 800; 
-            margin: 10px; 
             text-transform: uppercase; 
             transition: 0.4s; 
             text-decoration: none; 
-            display: inline-block; 
-            letter-spacing: 1px;
+            text-align: center;
+            letter-spacing: 1.5px;
+            font-size: 1.1rem;
         }
 
-    
         .btn-reg { 
             background-color: #ff9f1c; 
             color: white; 
             border: none; 
-            box-shadow: 0 10px 25px rgba(255, 159, 28, 0.4);
+            box-shadow: 0 10px 25px rgba(255, 159, 28, 0.3);
         }
+
         .btn-reg:hover { 
             background-color: #f39200; 
-            transform: translateY(-5px); 
-            box-shadow: 0 15px 35px rgba(255, 159, 28, 0.5);
+            transform: scale(1.03); 
             color: white;
         }
 
         .btn-log { 
-            background-color: transparent; 
-            color: white; 
-            border: 2.5px solid white; 
-        }
-        .btn-log:hover { 
-            background-color: white; 
+            background-color: #f1f5f9; 
             color: #011627; 
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(255, 255, 255, 0.2);
+            border: 2px solid #e2e8f0; 
         }
 
-        .button-container {
-            animation: fadeInUp 1s ease-out;
+        .btn-log:hover { 
+            background-color: #011627; 
+            color: white; 
+            border-color: #011627;
+            transform: scale(1.03);
         }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Анімація появи */
+        .fade-in {
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Адаптивність для мобілок */
+        @media (max-width: 992px) {
+            .right-side { display: none; }
+            .brand-title { font-size: 3.5rem; }
         }
     </style>
 </head>
 <body>
 
-<div class="hero">
-    <div class="container">
-        <h1 class="brand-title">Вет<span>Клініка</span></h1>
-        
-        <div class="d-flex justify-content-center flex-wrap button-container">
-            <a href="/likar/register/new" class="btn btn-hero btn-reg">
-                <i class="bi bi-person-plus-fill me-2"></i> Реєстрація
-            </a>
+<div class="main-container">
+    <div class="left-side">
+        <div class="fade-in text-center">
+            <h1 class="brand-title">Вет<span>Клініка</span></h1>
             
-            <a href="/likar/login" class="btn btn-hero btn-log">
-                <i class="bi bi-box-arrow-in-right me-2"></i> Увійти
-            </a>
+            <div class="btn-stack">
+                <a href="/likar/register/new" class="btn-hero btn-reg shadow">
+                    <i class="bi bi-person-plus-fill me-2"></i> Реєстрація
+                </a>
+                
+                <a href="/likar/login" class="btn-hero btn-log">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Увійти
+                </a>
+            </div>
         </div>
     </div>
+
+    <div class="right-side"></div>
 </div>
 
 </body>
