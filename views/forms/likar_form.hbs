@@ -3,45 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        body { background: linear-gradient(135deg, #2ec4b6 0%, #011627 100%); min-height: 100vh; display: flex; align-items: center; }
-        .form-card { background: white; border-radius: 20px; padding: 40px; width: 100%; max-width: 500px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
-        .btn-save { background: #2ec4b6; color: white; width: 100%; border-radius: 10px; padding: 12px; font-weight: bold; border: none; }
+        body { 
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%); 
+            min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        .form-card { 
+            background: white; border-radius: 35px; padding: 40px; width: 100%; max-width: 500px; 
+            box-shadow: 0 25px 60px rgba(0,0,0,0.1); border: none;
+        }
+        /* Стиль для таблиці графіка */
+        .work-schedule {
+            background: #f8fafc; border-radius: 15px; padding: 15px; margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+        }
+        .schedule-table { width: 100%; font-size: 0.85rem; margin-bottom: 0; }
+        .schedule-table td { padding: 5px; }
+        .day-off { color: #ff4d4d; font-weight: bold; }
+        .day-work { color: #2ec4b6; font-weight: bold; }
+
+        .btn-submit { 
+            background: #2ec4b6; color: white; width: 100%; border-radius: 18px; 
+            padding: 18px; font-weight: 800; border: none; transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-submit:hover { background: #26a69a; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(46,196,182,0.2); }
+        .form-control, .form-select { border-radius: 15px; padding: 14px; background: #f8fafc; border: 2px solid #e2e8f0; }
     </style>
 </head>
 <body>
+    <div class="form-card text-center">
+        <div class="mb-4">
+            <h3 class="fw-bold text-dark">🐾 {{#if isUpdate}}Редагування{{else}}Запис{{/if}}</h3>
+            <p class="text-muted small">Заповніть дані для візиту</p>
+        </div>
 
-<div class="container d-flex justify-content-center">
-    <div class="form-card">
-        <h3 class="text-center mb-4">📝 Запис пацієнта</h3>
-        <form action="/likar/create" method="POST">
-            <div class="mb-3">
-                <label class="form-label">Ім'я власника</label>
-                <input type="text" name="owner_name" class="form-control" placeholder="Наприклад, Іван" required>
+        <div class="work-schedule shadow-sm">
+            <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-clock-history me-2"></i>Графік роботи клініки</h6>
+            <table class="schedule-table">
+                <tr>
+                    <td>Пн - Пт</td>
+                    <td class="text-end day-work">08:00 — 20:00</td>
+                </tr>
+                <tr>
+                    <td>Субота</td>
+                    <td class="text-end day-off">Вихідний</td>
+                </tr>
+                <tr>
+                    <td>Неділя</td>
+                    <td class="text-end day-off">Вихідний</td>
+                </tr>
+            </table>
+        </div>
+
+        <form action="{{#if isUpdate}}/likar/edit/{{item.id}}{{else}}/likar/create{{/if}}" method="POST" id="appointmentForm">
+            <div class="mb-3 text-start">
+                <label class="form-label fw-bold small text-secondary">Дата візиту</label>
+                <input type="date" id="dateInput" name="date" class="form-control" value="{{item.date}}" required>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Кличка тварини</label>
-                <input type="text" name="pet_name" class="form-control" placeholder="Наприклад, Барон" required>
+
+            <div class="mb-4 text-start">
+                <label class="form-label fw-bold small text-secondary">Час (інтервал 30 хв)</label>
+                <select name="start_time" class="form-select" id="timeSelect" required>
+                    <option value="" disabled selected>Виберіть час...</option>
+                </select>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Номер телефону</label>
-                <input type="tel" name="phone" class="form-control" placeholder="+380..." required>
-            </div>
-            <div class="row">
-                <div class="col-6 mb-3">
-                    <label class="form-label">Дата</label>
-                    <input type="date" name="date" class="form-control" required>
-                </div>
-                <div class="col-6 mb-3">
-                    <label class="form-label">Час</label>
-                    <input type="time" name="start_time" class="form-control" step="1800" required>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-save mb-2">Забронювати час</button>
-            <a href="/likar" class="btn btn-light w-100">Повернутися</a>
+            
+            <div id="errorMessage" class="text-danger small mb-3 d-none"></div>
+
+            <button type="submit" class="btn btn-submit shadow-sm">
+                {{#if isUpdate}}Зберегти зміни{{else}}Записатись 🐾{{/if}}
+            </button>
+            <a href="/likar" class="d-block mt-3 text-decoration-none text-muted small">Скасувати та повернутись</a>
         </form>
     </div>
-</div>
 
+    <script>
+        const dateInput = document.getElementById('dateInput');
+        const timeSelect = document.getElementById('timeSelect');
+        const errorDiv = document.getElementById('errorMessage');
+
+        
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+        dateInput.setAttribute('max', '2027-12-31');
+
+    
+        const savedTime = "{{item.start_time}}";
+        function generateTimeSlots() {
+            for (let hour = 8; hour <= 19; hour++) {
+                ['00', '30'].forEach(min => {
+                    const timeStr = `${hour.toString().padStart(2, '0')}:${min}`;
+                    const option = document.createElement('option');
+                    option.value = timeStr;
+                    option.textContent = timeStr;
+                    if (savedTime && savedTime.startsWith(timeStr)) option.selected = true;
+                    timeSelect.appendChild(option);
+                });
+            }
+        }
+        generateTimeSlots();
+
+       
+        dateInput.addEventListener('change', function() {
+            const date = new Date(this.value);
+            const day = date.getUTCDay(); 
+            
+            if (day === 0 || day === 6) {
+                errorDiv.textContent = "⚠️ Вибачте, клініка не працює у вихідні!";
+                errorDiv.classList.remove('d-none');
+                this.value = ""; 
+            } else {
+                errorDiv.classList.add('d-none');
+            }
+        });
+    </script>
 </body>
 </html>

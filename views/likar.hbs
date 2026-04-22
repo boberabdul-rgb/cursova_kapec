@@ -3,45 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ВетКлініка 🐾</title>
+    <title>ВетКлініка — Графік прийому 🐾</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
-        .navbar { background-color: #2ec4b6 !important; } /* Бірюзовий колір для ветеринарки */
-        .card { border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .table thead { background-color: #2ec4b6; color: white; }
-        .btn-add { background-color: #ff9f1c; color: white; border-radius: 30px; padding: 10px 25px; }
-        .btn-add:hover { background-color: #e71d36; color: white; }
+        :root { 
+            --primary-dark: #011627; 
+            --accent-cyan: #2ec4b6; 
+            --accent-orange: #ff9f1c;
+            --text-light: #f8fafc;
+        }
+
+        body { background-color: #f1f5f9; font-family: 'Segoe UI', sans-serif; }
+
+        
+        .premium-nav {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0b3d59 100%);
+            padding: 18px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-bottom: 3px solid var(--accent-cyan);
+        }
+
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .brand-logo {
+            font-size: 2rem;
+            margin-right: 12px;
+            filter: drop-shadow(0 0 8px rgba(46, 196, 182, 0.5));
+        }
+
+        .brand-name {
+            color: white;
+            font-weight: 800;
+            font-size: 1.6rem;
+            letter-spacing: -0.5px;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .brand-name span { color: var(--accent-cyan); }
+
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 18px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-name {
+            color: var(--text-light);
+            font-weight: 600;
+            margin-right: 15px;
+            font-size: 0.95rem;
+        }
+
+        .user-name strong {
+            color: var(--accent-cyan);
+            background: rgba(46, 196, 182, 0.15);
+            padding: 3px 10px;
+            border-radius: 8px;
+            margin-left: 5px;
+        }
+
+        .btn-logout {
+            background: rgba(255, 77, 77, 0.15);
+            color: #ff4d4d;
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            border-radius: 50px;
+            padding: 6px 15px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-logout:hover {
+            background: #ff4d4d;
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
+        }
+
+       
+        .header-card {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            margin-top: -20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-new-appointment {
+            background: linear-gradient(45deg, var(--accent-orange), #ffbf69);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 16px;
+            font-weight: 700;
+            box-shadow: 0 8px 20px rgba(255, 159, 28, 0.3);
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-new-appointment:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255, 159, 28, 0.4);
+            color: white;
+        }
+
+       
+        .main-table-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.04);
+            margin-top: 30px;
+        }
+
+        .table thead th {
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            padding: 20px;
+            border: none;
+        }
+
+        .table tbody td { padding: 20px; vertical-align: middle; border-bottom: 1px solid #f1f5f9; }
+
+        .time-badge {
+            background: #e0f2f1;
+            color: var(--accent-cyan);
+            font-weight: 700;
+            padding: 8px 15px;
+            border-radius: 12px;
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            margin: 0 4px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .edit-icon { background: #f0fdfa; color: var(--accent-cyan); }
+        .edit-icon:hover { background: var(--accent-cyan); color: white; }
+
+        .delete-icon { background: #fff1f2; color: #ff4d4d; }
+        .delete-icon:hover { background: #ff4d4d; color: white; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-dark mb-4">
-    <div class="container">
-        <a class="navbar-brand" href="/likar">
-            <i class="bi bi-patch-check-fill"></i> ВетКлініка "Щасливі лапки"
+<nav class="premium-nav">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a href="/" class="brand-wrapper">
+            <span class="brand-logo">🐾</span>
+            <h1 class="brand-name">Вет<span>Клініка</span></h1>
         </a>
+        
+        <div class="user-profile shadow-sm">
+            <span class="user-name">Привіт, <strong>{{user}}</strong></span>
+            <a href="/likar/logout" class="btn-logout">Вийти</a>
+        </div>
     </div>
 </nav>
 
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-secondary">Графік прийому</h2>
-        <a href="/likar/create" class="btn btn-add shadow-sm">
-            <i class="bi bi-plus-lg"></i> Новий пацієнт
+<div class="container mt-4">
+    <div class="header-card">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Графік прийомів</h2>
+            <p class="text-muted mb-0 small"><i class="bi bi-calendar3 me-2"></i>Сьогоднішні записи</p>
+        </div>
+        <a href="/likar/create" class="btn-new-appointment">
+            <i class="bi bi-plus-circle-fill me-2"></i> Новий запис
         </a>
     </div>
 
-    <div class="card p-3">
+    <div class="main-table-card">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table mb-0">
                 <thead>
                     <tr>
                         <th>Дата</th>
-                        <th>Час (30 хв)</th>
+                        <th>Час</th>
                         <th>Власник</th>
-                        <th>Тварина 🐶</th>
+                        <th>Тварина</th>
                         <th>Контакти</th>
                         <th class="text-center">Дії</th>
                     </tr>
@@ -49,14 +213,17 @@
                 <tbody>
                     {{#each appointments}}
                     <tr>
-                        <td><span class="badge bg-light text-dark">{{this.appointment_date}}</span></td>
-                        <td><strong>{{this.start_time}} - {{this.end_time}}</strong></td>
-                        <td>{{this.owner_name}}</td>
-                        <td><i class="bi bi-heart-fill text-danger"></i> {{this.pet_name}}</td>
-                        <td><a href="tel:{{this.phone}}" class="text-decoration-none">{{this.phone}}</a></td>
+                        <td class="fw-semibold text-secondary">{{this.appointment_date}}</td>
+                        <td><span class="time-badge shadow-sm">{{this.start_time}}</span></td>
+                        <td><strong class="text-dark">{{this.owner_name}}</strong></td>
+                        <td><i class="bi bi-paw-fill text-muted me-2"></i>{{this.pet_name}}</td>
+                        <td><i class="bi bi-telephone-fill small text-muted me-2"></i>{{this.phone}}</td>
                         <td class="text-center">
-                            <a href="/likar/delete/{{this.id}}" class="btn btn-outline-danger btn-sm border-0">
-                                <i class="bi bi-trash3"></i>
+                            <a href="/likar/edit/{{this.id}}" class="action-icon edit-icon shadow-sm">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            <a href="/likar/delete/{{this.id}}" class="action-icon delete-icon shadow-sm" onclick="return confirm('Видалити цей запис?')">
+                                <i class="bi bi-trash3-fill"></i>
                             </a>
                         </td>
                     </tr>

@@ -2,8 +2,12 @@ import express from 'express';
 const router = express.Router();
 import db from '../db/connector.js';
 
-// 1. Головна сторінка — Список усіх записів
-router.get('/', async (req, res) => {
+function isAuthenticated(req, res, next) {
+    if (req.session.userId) return next();
+    res.redirect('/likar/login');
+} 
+
+router.get('/', isAuthenticated, async (req, res) => {
     try {
         const query = `
             SELECT a.id, c.owner_name, c.pet_name, c.phone, 
@@ -14,66 +18,118 @@ router.get('/', async (req, res) => {
             ORDER BY a.appointment_date DESC, a.start_time ASC
         `;
         const result = await db.query(query);
-        
-        // ВАЖЛИВО: Тут я змінив 'likar_index' на 'likar', 
-        // бо твій файл на скріншоті називається likar.hbs
-        res.render('likar', { appointments: result.rows });
+        res.render('likar', { 
+            appointments: result.rows, 
+            user: req.session.userNickname 
+        });
     } catch (err) {
-        res.status(500).send("Database Error: " + err.message);
+        res.status(500).render('error', { message: err.message });
     }
 });
 
-// 2. Форма створення запису
-router.get('/create', (req, res) => {
-    // Вказуємо шлях до форми всередині папки forms
+router.get('/login', (req, res) => {
+    if (req.session.userId) return res.redirect('/likar');
+    res.render('forms/logiin_form'); 
+});
+
+router.post('/login', async (req, res) => {
+    const { phone, password } = req.body;
+    try {
+        const result = await db.query('SELECT * FROM clients WHERE phone = $1 AND password = $2', [phone, password]);
+        if (result.rows.length > 0) {
+            req.session.userId = result.rows[0].id;
+            req.session.userNickname = result.rows[0].owner_name;
+            res.redirect('/likar');
+        } else {
+            res.status(401).render('forms/auth_error');
+        }
+    } catch (err) {
+        res.status(500).render('error', { message: "Помилка авторизації" });
+    }
+});
+
+router.get('/register/new', (req, res) => {
+    if (req.session.userId) return res.redirect('/likar');
+    res.render('forms/register_form');
+});
+
+router.post('/register/new', async (req, res) => {
+    const { owner_name, pet_name, phone, password } = req.body;
+    try {
+        const result = await db.query(
+            'INSERT INTO clients (owner_name, pet_name, phone, password) VALUES ($1, $2, $3, $4) RETURNING id, owner_name',
+            [owner_name, pet_name, phone, password]
+        );
+        req.session.userId = result.rows[0].id;
+        req.session.userNickname = result.rows[0].owner_name;
+        res.redirect('/likar');
+    } catch (err) {
+        res.status(500).render('error', { message: "Помилка реєстрації" });
+    }
+});
+
+router.get('/edit/:id', isAuthenticated, async (req, res) => {
+    try {
+        const result = await db.query(
+            "SELECT id, TO_CHAR(appointment_date, 'YYYY-MM-DD') as date, start_time FROM appointments WHERE id = $1",
+            [req.params.id]
+        );
+        if (result.rows.length > 0) {
+            res.render('forms/likar_form', { item: result.rows[0], isUpdate: true });
+        } else {
+            res.status(404).render('error', { message: "Запис не знайдено" });
+        }
+    } catch (err) {
+        res.status(500).render('error', { message: err.message });
+    }
+});
+
+router.post('/edit/:id', isAuthenticated, async (req, res) => {
+    const { date, start_time } = req.body;
+    try {
+        const [h, m] = start_time.split(':').map(Number);
+        const end = new Date(new Date().setHours(h, m + 30));
+        const end_time = `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`;
+
+        await db.query(
+            "UPDATE appointments SET appointment_date = $1, start_time = $2, end_time = $3 WHERE id = $4",
+            [date, start_time, end_time, req.params.id]
+        );
+        res.redirect('/likar');
+    } catch (err) {
+        res.status(500).render('error', { message: "Не вдалося оновити запис" });
+    }
+});
+
+router.get('/create', isAuthenticated, (req, res) => {
     res.render('forms/likar_form', { item: {}, isUpdate: false });
 });
 
-// 3. Обробка створення
-router.post('/create', async (req, res) => {
-    const { owner_name, pet_name, phone, date, start_time } = req.body;
-
-    const appointmentDate = new Date(date);
-    const dayOfWeek = appointmentDate.getDay(); 
-    if (dayOfWeek === 0 || dayOfWeek === 6) {
-        return res.status(400).send("❌ Помилка: Клініка не працює у вихідні!");
-    }
-
-    const [hours, minutes] = start_time.split(':').map(Number);
-    const start = new Date();
-    start.setHours(hours, minutes, 0);
-    const end = new Date(start.getTime() + 30 * 60000);
-    const end_time = `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`;
-
+router.post('/create', isAuthenticated, async (req, res) => {
+    const { date, start_time } = req.body;
     try {
-        const clientRes = await db.query(
-            'INSERT INTO clients (owner_name, pet_name, phone) VALUES ($1, $2, $3) RETURNING id',
-            [owner_name, pet_name, phone]
-        );
-        const clientId = clientRes.rows[0].id;
+        const [h, m] = start_time.split(':').map(Number);
+        const end = new Date(new Date().setHours(h, m + 30));
+        const end_time = `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`;
 
         await db.query(
             'INSERT INTO appointments (client_id, appointment_date, start_time, end_time) VALUES ($1, $2, $3, $4)',
-            [clientId, date, start_time, end_time]
+            [req.session.userId, date, start_time, end_time]
         );
-        
         res.redirect('/likar');
     } catch (err) {
-        if (err.code === '23505') {
-            return res.status(400).send("❌ Цей час уже зайнятий!");
-        }
-        res.status(500).send("SQL Error: " + err.message);
+        res.status(500).render('error', { message: "Цей час уже зайнятий!" });
     }
 });
 
-// 4. Видалення запису
-router.get('/delete/:id', async (req, res) => {
-    try {
-        await db.query('DELETE FROM appointments WHERE id = $1', [req.params.id]);
-        res.redirect('/likar');
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
+router.get('/delete/:id', isAuthenticated, async (req, res) => {
+    await db.query('DELETE FROM appointments WHERE id = $1', [req.params.id]);
+    res.redirect('/likar');
+});
+
+router.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
 });
 
 export default router;
