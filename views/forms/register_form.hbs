@@ -117,22 +117,16 @@
 
         <form action="/likar/register/new" method="POST">
             <div class="text-start">
-                <label class="form-label ms-1">Ім'я власника</label>
+                <label class="form-label ms-1">Повне ім'я власника</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-person"></i></span>
-                    <input type="text" name="first_name" class="form-control" placeholder="" required>
+                    <input type="text" name="owner_name" class="form-control" placeholder="Ім'я та Прізвище" required>
                 </div>
 
-                <label class="form-label ms-1">Прізвище власника</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                    <input type="text" name="last_name" class="form-control" placeholder="" required>
-                </div>
-
-                <label class="form-label ms-1">Назва тварини</label>
+                <label class="form-label ms-1">Кличка тварини</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-paw"></i></span>
-                    <input type="text" name="pet_name" class="form-control" placeholder="" required>
+                    <input type="text" name="pet_name" class="form-control" placeholder="Як звати улюбленця?" required>
                 </div>
 
                 <label class="form-label ms-1">Номер телефону</label>
@@ -148,10 +142,10 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-register">Зареєструватись</button>
+            <button type="submit" class="btn btn-register">Створити акаунт</button>
             
             <div class="footer-divider">
-                <a href="/likar/login" class="link-footer">Вже з нами? <strong class="text-dark">Увійти</strong></a>
+                <a href="/likar/login" class="link-footer">Вже є акаунт? <strong class="text-dark">Увійти</strong></a>
                 <div class="mt-2">
                     <a href="/" class="link-footer small"><i class="bi bi-arrow-left"></i> На головну</a>
                 </div>
