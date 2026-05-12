@@ -73,8 +73,8 @@ app.use(function (err, req, res, next) {
 
 const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Сервер ветеринарної клініки працює на http://localhost:${PORT}`);
-    console.log(`🏠 Головна сторінка: http://localhost:${PORT}`);
+    console.log(`Сервер ветеринарної клініки працює на http://localhost:${PORT}`);
+    console.log(`Головна сторінка: http://localhost:${PORT}`);
 }); 
 
 export default app;
